@@ -1,4 +1,4 @@
-<form action="{{ route('products.update', $product->uuid) }}" method="POST" enctype="multipart/form-data">
+<form action="{{ route('product.update', $product->uuid) }}" method="POST" enctype="multipart/form-data">
     @csrf
     @method('PUT')
     <div class="mb-4">

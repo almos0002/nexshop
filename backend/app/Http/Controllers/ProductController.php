@@ -27,7 +27,7 @@ class ProductController extends Controller
             'uuid' => 'PP' . mt_rand(100000, 999999),
             ...$request->all()
         ]);
-        return redirect()->route('products.create', $product->uuid);
+        return redirect()->route('product.create', $product->uuid);
     }
 
     // Display the specified resource
@@ -49,7 +49,7 @@ class ProductController extends Controller
     {
         $product = Product::where('uuid', $uuid)->first();
         $product->update($request->all());
-        return redirect()->route('products.create');
+        return redirect()->route('product.create');
     }
 
     // Remove the specified resource from storage.
@@ -57,6 +57,6 @@ class ProductController extends Controller
     {
         $product = Product::where('uuid', $uuid)->first();
         $product->delete();
-        return redirect()->route('products.create');
+        return redirect()->route('product.create');
     }
 }

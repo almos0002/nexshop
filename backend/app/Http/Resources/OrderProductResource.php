@@ -14,6 +14,11 @@ class OrderProductResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'order_uuid' => $this->order_uuid,
+            'product_uuid' => $this->product_uuid,
+            'quantity' => $this->quantity,
+            'price' => (float) $this->price,
+        ];
     }
 }
