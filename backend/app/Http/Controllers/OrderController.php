@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Resources\OrderResource;
 use App\Models\Order;
 use App\Models\OrderProduct;
+use App\Models\Product;
 
 class OrderController extends Controller
 {
@@ -33,6 +34,10 @@ class OrderController extends Controller
             $totalPrice += $orderProduct->quantity * $orderProduct->price;
         }
 
+        $product = Product::where('uuid', $orderProduct->product_uuid)->first();
+        $product->update([
+            'stock' => $product->stock - $orderProduct->quantity
+        ]);
         $order->update([
             'total_price' => $totalPrice
         ]);
