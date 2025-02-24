@@ -15,4 +15,14 @@ class Product extends Model
         'stock',
         'image',
     ];
+
+    public function orders()
+    {
+        return $this->belongsToMany(Order::class);
+    }
+
+    public function orderProducts()
+    {
+        return $this->belongsToMany(OrderProduct::class);
+    }
 }
