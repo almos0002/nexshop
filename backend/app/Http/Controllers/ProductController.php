@@ -27,7 +27,7 @@ class ProductController extends Controller
             'uuid' => 'PP' . mt_rand(100000, 999999),
             ...$request->all()
         ]);
-        return route('products.show', $product->uuid);
+        return redirect()->route('products.create', $product->uuid);
     }
 
     // Display the specified resource
