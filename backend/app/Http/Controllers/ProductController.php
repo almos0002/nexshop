@@ -41,7 +41,7 @@ class ProductController extends Controller
             $product->save();
         }
 
-        return redirect()->route('product.create', $product->uuid);
+        return redirect()->route('product.list', $product->uuid)->with('success', 'Product created successfully');
     }
 
     // Display the specified resource
@@ -63,7 +63,15 @@ class ProductController extends Controller
     {
         $product = Product::where('uuid', $uuid)->first();
         $product->update($request->all());
-        return redirect()->route('product.create');
+
+        // Handle product image upload
+        if ($request->hasFile('image')) {
+            $profilePath = $request->file('image')->store('product-images', 'public');
+            $product['image'] = $profilePath;
+            $product->update();
+        }
+
+        return redirect()->route('product.list')->with('success', 'Product updated successfully');
     }
 
     // Remove the specified resource from storage.
@@ -71,6 +79,6 @@ class ProductController extends Controller
     {
         $product = Product::where('uuid', $uuid)->first();
         $product->delete();
-        return redirect()->route('product.create');
+        return redirect()->route('product.list')->with('success', 'Product deleted successfully');
     }
 }
