@@ -14,6 +14,11 @@ class ProductController extends Controller
         return ProductResource::collection(Product::all());
     }
 
+    public function list()
+    {
+        $products = Product::all();
+        return view('product.list', compact('products'));
+    }
     // Show the form for creating a new resource
     public function create()
     {
