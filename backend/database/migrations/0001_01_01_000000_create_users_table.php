@@ -17,6 +17,8 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->decimal('wallet', 10, 2);
+            $table->boolean('isAdmin');
             $table->rememberToken();
             $table->timestamps();
         });

@@ -7,6 +7,7 @@ use App\Http\Resources\OrderResource;
 use App\Models\Order;
 use App\Models\OrderProduct;
 use App\Models\Product;
+use App\Models\User;
 
 class OrderController extends Controller
 {
@@ -38,8 +39,16 @@ class OrderController extends Controller
         $product->update([
             'stock' => $product->stock - $orderProduct->quantity
         ]);
+
+
         $order->update([
             'total_price' => $totalPrice
+        ]);
+
+        $user = User::where('id', $request->user_id)->first();
+        // dd($user);
+        $user->update([
+            'wallet' => $user->wallet - $totalPrice
         ]);
 
         return new OrderResource($order->fresh());

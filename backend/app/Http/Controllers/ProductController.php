@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Http\Resources\ProductResource;
-use App\Models\Product;
 
 class ProductController extends Controller
 {
@@ -25,6 +26,7 @@ class ProductController extends Controller
     {
         $product = Product::create([
             'uuid' => 'PP' . mt_rand(100000, 999999),
+            // Str::uuid(),
             ...$request->all()
         ]);
         return redirect()->route('product.create', $product->uuid);
