@@ -30,7 +30,7 @@ class OrderController extends Controller
                 'order_uuid' => $order->uuid,
                 'product_uuid' => $product['uuid'],
                 'quantity' => $product['quantity'],
-                'price' => $product['price']
+                'price' => Product::where('uuid', $product['uuid'])->firstOrFail()->price,
             ]);
             $totalPrice += $orderProduct->quantity * $orderProduct->price;
         }
