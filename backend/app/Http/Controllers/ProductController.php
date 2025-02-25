@@ -31,9 +31,16 @@ class ProductController extends Controller
     {
         $product = Product::create([
             'uuid' => 'PP' . mt_rand(100000, 999999),
-            // Str::uuid(),
             ...$request->all()
         ]);
+
+        // Handle product image upload
+        if ($request->hasFile('image')) {
+            $profilePath = $request->file('image')->store('product-images', 'public');
+            $product['image'] = $profilePath;
+            $product->save();
+        }
+
         return redirect()->route('product.create', $product->uuid);
     }
 
