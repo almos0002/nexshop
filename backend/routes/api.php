@@ -9,5 +9,5 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-Route::apiResource('products', ProductController::class);
-Route::apiResource('orders', OrderController::class);
+Route::apiResource('products', ProductController::class)->only(['index', 'show']);
+Route::apiResource('orders', OrderController::class)->only(['index', 'store', 'show']);
