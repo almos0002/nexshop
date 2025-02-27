@@ -30,6 +30,7 @@ class AuthController extends Controller
             // 'token_type' => 'Bearer',
             'id' => $user->id,
             'name' => $user->name,
+            'wallet' => $user->wallet,
             'status' => 'Login Successfull',
         ]);
     }

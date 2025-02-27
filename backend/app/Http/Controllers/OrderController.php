@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\OrderProductResource;
 use Illuminate\Http\Request;
 use App\Http\Resources\OrderResource;
 use App\Models\Order;
@@ -66,6 +67,17 @@ class OrderController extends Controller
     public function show(string $uuid)
     {
         $order = Order::where('uuid', $uuid)->first();
-        return new OrderResource($order);
+        $orderProducts = OrderProduct::where('order_uuid', $uuid)->get();
+        return response()->json([
+            'uuid' => $order->first()->uuid,
+            'total_price' => $order->first()->total_price,
+            'products' => $orderProducts->map(function ($orderProduct) {
+                return [
+                    'product_uuid' => $orderProduct->product_uuid,
+                    'quantity' => $orderProduct->quantity,
+                    'price' => $orderProduct->price
+                ];
+            })
+        ]);
     }
 }
