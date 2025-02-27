@@ -36,9 +36,14 @@ class OrderController extends Controller
         }
 
         $product = Product::where('uuid', $orderProduct->product_uuid)->first();
-        $product->update([
-            'stock' => $product->stock - $orderProduct->quantity
-        ]);
+        if ($product->stock >= $orderProduct->quantity) {
+            $product->update([
+                'stock' => $product->stock - $orderProduct->quantity
+            ]);
+        } else {
+            return response()->json(['error' => "Not Enough Quantity"], 400);
+        }
+
 
 
         $order->update([
@@ -46,10 +51,14 @@ class OrderController extends Controller
         ]);
 
         $user = User::where('id', $request->user_id)->first();
-        // dd($user);
-        $user->update([
-            'wallet' => $user->wallet - $totalPrice
-        ]);
+
+        if ($user->wallet >= $totalPrice) {
+            $user->update([
+                'wallet' => $user->wallet - $totalPrice
+            ]);
+        } else {
+            return response()->json(['error' => 'Insufficient Balance, Add some money Gareeb'], 400);
+        }
 
         return new OrderResource($order->fresh());
     }
