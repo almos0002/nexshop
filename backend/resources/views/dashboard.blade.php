@@ -13,34 +13,42 @@
                         </div>
                     @endif
 
-                    <h4>Welcome {{ Auth::user()->name }}!</h4>
-                    <p>Check Your Today's Stats</p>
+                    <h4 class="fs-3">Welcome {{ Auth::user()->name }}!</h4>
+                    <p class="fs-5">Check Your Today's Stats</p>
                     
-                    <!-- Add your dashboard content here -->
                     <div class="row mt-4">
-                        <div class="col-md-4">
-                            <div class="card" style="height: 200px;">
+                        <div class="col-md-3">
+                            <div class="card h-100">
                                 <div class="card-body d-flex flex-column justify-content-between">
-                                    <h5 class="card-title">Total Products</h5>
-                                    <p class="card-text display-4">0</p>
+                                    <h5 class="card-title fs-4">Total Products</h5>
+                                    <p class="card-text display-4 fs-1">{{ $TotalProducts }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="card h-100">
+                                <div class="card-body d-flex flex-column justify-content-between">
+                                    <h5 class="card-title fs-4">Total Users</h5>
+                                    <p class="card-text display-4 fs-1">{{ $TotalUsers }}</p>
                                 </div>
                             </div>
                         </div>
                         
-                        <div class="col-md-4">
-                            <div class="card" style="height: 200px;">
+                        <div class="col-md-3">
+                            <div class="card h-100">
                                 <div class="card-body d-flex flex-column justify-content-between">
-                                    <h5 class="card-title">Total Orders</h5>
-                                    <p class="card-text display-4">0</p>
+                                    <h5 class="card-title fs-4">Total Orders</h5>
+                                    <p class="card-text display-4 fs-1">{{ $TotalOrders }}</p>
                                 </div>
                             </div>
                         </div>
                         
-                        <div class="col-md-4">
-                            <div class="card" style="height: 200px;">
+                        <div class="col-md-3">
+                            <div class="card h-100">
                                 <div class="card-body d-flex flex-column justify-content-between">
-                                    <h5 class="card-title">Total Earnings</h5>
-                                    <p class="card-text display-4">₹0</p>
+                                    <h5 class="card-title fs-4">Total Revenue</h5>
+                                    <p class="card-text display-4 fs-1">₹{{ $TotalRevenue }}</p>
                                 </div>
                             </div>
                         </div>
