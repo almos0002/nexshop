@@ -70,6 +70,7 @@ class OrderController extends Controller
         $orderProducts = OrderProduct::where('order_uuid', $uuid)->get();
         return response()->json([
             'uuid' => $order->uuid,
+            'user_id' => $order->user_id,
             'total_price' => $order->total_price,
             'products' => OrderProductResource::collection($orderProducts)
         ]);
