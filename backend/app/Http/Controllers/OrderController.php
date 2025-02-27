@@ -69,15 +69,9 @@ class OrderController extends Controller
         $order = Order::where('uuid', $uuid)->first();
         $orderProducts = OrderProduct::where('order_uuid', $uuid)->get();
         return response()->json([
-            'uuid' => $order->first()->uuid,
-            'total_price' => $order->first()->total_price,
-            'products' => $orderProducts->map(function ($orderProduct) {
-                return [
-                    'product_uuid' => $orderProduct->product_uuid,
-                    'quantity' => $orderProduct->quantity,
-                    'price' => $orderProduct->price
-                ];
-            })
+            'uuid' => $order->uuid,
+            'total_price' => $order->total_price,
+            'products' => OrderProductResource::collection($orderProducts)
         ]);
     }
 }
