@@ -16,7 +16,15 @@ class OrderController extends Controller
 {
     public function index()
     {
-        return OrderResource::collection(Order::all());
+        return response()->json([
+            "data" => Order::all()->map(function ($order) {
+                return [
+                    "uuid" => $order->uuid,
+                    "user_id" => $order->user_id,
+                    "total_price" => $order->total_price
+                ];
+            })
+        ]);
     }
 
     public function store(Request $request)
@@ -31,27 +39,27 @@ class OrderController extends Controller
 
         // Start a database transaction
         DB::beginTransaction();
-        
+
         try {
             // Calculate total price and check product quantities
             $totalPrice = 0;
             $productUpdates = [];
-            
+
             // First, validate all products have enough quantity and calculate total price
             foreach ($request->products as $productData) {
                 $product = Product::where('uuid', $productData['uuid'])->lockForUpdate()->firstOrFail();
                 $quantity = $productData['quantity'];
-                
+
                 // Check if enough quantity is available
                 if ($product->stock < $quantity) {
                     DB::rollBack();
                     return response()->json(['error' => 'Not Enough Quantity', 'product' => $product->name], 400);
                 }
-                
+
                 $price = $product->price;
                 $subtotal = $price * $quantity;
                 $totalPrice += $subtotal;
-                
+
                 // Save product data for later update
                 $productUpdates[] = [
                     'product' => $product,
@@ -59,27 +67,27 @@ class OrderController extends Controller
                     'price' => $price
                 ];
             }
-            
+
             // Check if user has enough balance
             $user = User::where('id', $request->user_id)->lockForUpdate()->firstOrFail();
             if ($user->wallet < $totalPrice) {
                 DB::rollBack();
                 return response()->json(['error' => 'Not Enough Balance', 'required' => $totalPrice, 'available' => $user->wallet], 400);
             }
-            
+
             // Create the order
             $order = Order::create([
                 'uuid' => 'OD' . mt_rand(100000, 999999),
                 'user_id' => $request->user_id,
                 'total_price' => $totalPrice,
             ]);
-            
+
             // Create order products and update stock
             foreach ($productUpdates as $data) {
                 $product = $data['product'];
                 $quantity = $data['quantity'];
                 $price = $data['price'];
-                
+
                 // Create order product
                 OrderProduct::create([
                     'order_uuid' => $order->uuid,
@@ -87,23 +95,22 @@ class OrderController extends Controller
                     'quantity' => $quantity,
                     'price' => $price,
                 ]);
-                
+
                 // Update product stock
                 $product->update([
                     'stock' => $product->stock - $quantity
                 ]);
             }
-            
+
             // Update user's wallet
             $user->update([
                 'wallet' => $user->wallet - $totalPrice
             ]);
-            
+
             // Commit the transaction
             DB::commit();
-            
+
             return new OrderResource($order->fresh());
-            
         } catch (Exception $e) {
             // Something went wrong, rollback the transaction
             DB::rollBack();
