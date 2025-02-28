@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import Navbar from './components/Navbar/Navbar';
 import ProductList from './components/Products/ProductList';
+import ProductDetail from './components/Products/ProductDetail';
 import Checkout from './components/Checkout/Checkout';
 import OrderHistory from './components/OrderHistory/OrderHistory';
 import Footer from './components/Footer/Footer';
@@ -46,6 +47,7 @@ function App() {
         <Routes>
           <Route path="/" element={<ProductList addToCart={addToCart} />} />
           <Route path="/products" element={<ProductList addToCart={addToCart} />} />
+          <Route path="/products/:uuid" element={<ProductDetail addToCart={addToCart} />} />
           <Route path="/checkout" element={<Checkout cartItems={cartItems} setCartItems={setCartItems} />} />
           <Route path="/orders" element={<OrderHistory />} />
           <Route path="/categories" element={<Categories />} />

@@ -21,6 +21,7 @@ export const fetchProducts = async () => {
     // Transform the data to match our expected format
     return result.data.map(product => ({
       id: product.uuid,
+      uuid: product.uuid,
       name: product.name,
       price: product.price,
       description: product.description,
@@ -29,6 +30,27 @@ export const fetchProducts = async () => {
     }));
   } catch (error) {
     console.error('Error fetching products:', error);
+    throw error;
+  }
+};
+
+/**
+ * Fetch a single product by UUID
+ * @param {string} uuid - The product UUID
+ * @returns {Promise<Object>} - The product data
+ */
+export const fetchProductByUUID = async (uuid) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/products/${uuid}`);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    return data.data; // Return the product data from the response
+  } catch (error) {
+    console.error('Error fetching product details:', error);
     throw error;
   }
 };
@@ -110,6 +132,7 @@ export const fetchOrderHistory = async () => {
 // Export default object with all API functions
 export default {
   fetchProducts,
+  fetchProductByUUID,
   fetchProductById,
   placeOrder,
   fetchOrderHistory

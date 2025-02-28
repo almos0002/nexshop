@@ -13,7 +13,14 @@ const ProductList = ({ addToCart }) => {
       setLoading(true);
       try {
         const productsData = await fetchProducts();
-        setProducts(productsData);
+        
+        // Process products to ensure image URLs are complete
+        const processedProducts = productsData.map(product => ({
+          ...product,
+          image: product.image ? `${product.image}` : 'https://via.placeholder.com/400x400?text=No+Image'
+        }));
+        
+        setProducts(processedProducts);
       } catch (err) {
         setError(err.message);
         console.error('Error fetching products:', err);
@@ -77,7 +84,7 @@ const ProductList = ({ addToCart }) => {
       {/* Product grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredProducts.map(product => (
-          <ProductCard key={product.id} product={product} addToCart={addToCart} />
+          <ProductCard key={product.id || product.uuid} product={product} addToCart={addToCart} />
         ))}
       </div>
       
