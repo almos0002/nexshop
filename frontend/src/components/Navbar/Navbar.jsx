@@ -5,7 +5,16 @@ const Navbar = ({ cartCount = 0, onCheckoutClick, onOrderHistoryClick, user, onL
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const profileMenuRef = useRef(null);
-  const walletBalance = user ? parseFloat(user.wallet) : 0;
+  
+  // Ensure wallet balance is properly parsed from user object
+  const walletBalance = user && user.wallet ? parseFloat(user.wallet) : 0;
+  
+  // Log wallet balance for debugging
+  useEffect(() => {
+    if (user) {
+      console.log('Navbar received user with wallet:', user.wallet);
+    }
+  }, [user]);
 
   // Close profile menu when clicking outside
   useEffect(() => {

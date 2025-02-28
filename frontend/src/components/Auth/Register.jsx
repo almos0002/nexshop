@@ -37,8 +37,12 @@ const Register = ({ onRegisterSuccess }) => {
       const response = await register(formData);
       
       if (onRegisterSuccess) {
+        // Make sure we pass the complete user object including wallet balance
         onRegisterSuccess(response.user);
       }
+      
+      // Log the user object to verify wallet is present
+      console.log('User registered with wallet balance:', response.user.wallet);
       
       // Redirect to home page
       navigate('/');

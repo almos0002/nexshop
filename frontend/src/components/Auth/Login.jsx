@@ -28,8 +28,12 @@ const Login = ({ onLoginSuccess }) => {
       const response = await login(formData);
       
       if (onLoginSuccess) {
+        // Make sure we pass the complete user object including wallet balance
         onLoginSuccess(response.user);
       }
+      
+      // Log the user object to verify wallet is present
+      console.log('User logged in with wallet balance:', response.user.wallet);
       
       // Redirect to home page
       navigate('/');

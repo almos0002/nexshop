@@ -25,8 +25,14 @@ function App() {
     const loggedInUser = getUser();
     if (loggedInUser) {
       setUser(loggedInUser);
+      console.log('App loaded user with wallet balance:', loggedInUser.wallet);
     }
   }, []);
+
+  const handleLoginSuccess = (userData) => {
+    console.log('Login success in App with wallet:', userData.wallet);
+    setUser(userData);
+  };
 
   const handleLogout = () => {
     logout();
@@ -75,7 +81,7 @@ function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/wallet/add" element={<AddFunds user={user} />} />
           <Route path="/wallet/history" element={<TransactionHistory user={user} />} />
-          <Route path="/login" element={<Login onLoginSuccess={setUser} />} />
+          <Route path="/login" element={<Login onLoginSuccess={handleLoginSuccess} />} />
           <Route path="/register" element={<Register onRegisterSuccess={setUser} />} />
         </Routes>
       </main>
