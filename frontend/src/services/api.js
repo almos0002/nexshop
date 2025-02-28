@@ -250,6 +250,44 @@ export const isAuthenticated = () => {
   return !!getAuthToken();
 };
 
+/**
+ * Fetch the current user data from the server
+ * This is used to get the latest user data, including wallet balance
+ * @returns {Promise<Object>} - The user data
+ */
+export const fetchCurrentUser = async () => {
+  try {
+    const token = getAuthToken();
+    if (!token) {
+      throw new Error('No authentication token found');
+    }
+
+    const response = await fetch(`${API_BASE_URL}/user`, {
+      method: 'GET',
+      headers: {
+        ...authHeader()
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Error fetching user data: ${response.status}`);
+    }
+    
+    const userData = await response.json();
+    
+    // Update the stored user data
+    if (userData && userData.wallet) {
+      console.log('fetchCurrentUser: Received updated user with wallet balance:', userData.wallet);
+      localStorage.setItem('user', JSON.stringify(userData));
+    }
+    
+    return userData;
+  } catch (error) {
+    console.error('Error fetching current user:', error);
+    throw error;
+  }
+};
+
 // Add authentication to API calls that need it
 const authHeader = () => {
   const token = getAuthToken();
@@ -268,5 +306,6 @@ export default {
   logout,
   getAuthToken,
   getUser,
-  isAuthenticated
+  isAuthenticated,
+  fetchCurrentUser
 };

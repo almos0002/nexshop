@@ -1,20 +1,45 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 
-const Navbar = ({ cartCount = 0, onCheckoutClick, onOrderHistoryClick, user, onLogout }) => {
+const Navbar = ({ cartCount = 0, onCheckoutClick, onOrderHistoryClick, user, onLogout, refreshUserData }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [refreshingWallet, setRefreshingWallet] = useState(false);
+  const [localUser, setLocalUser] = useState(user);
   const profileMenuRef = useRef(null);
   
+  // Update localUser when user prop changes
+  useEffect(() => {
+    setLocalUser(user);
+  }, [user]);
+  
   // Ensure wallet balance is properly parsed from user object
-  const walletBalance = user && user.wallet ? parseFloat(user.wallet) : 0;
+  const walletBalance = localUser && localUser.wallet ? parseFloat(localUser.wallet) : 0;
   
   // Log wallet balance for debugging
   useEffect(() => {
-    if (user) {
-      console.log('Navbar received user with wallet:', user.wallet);
+    if (localUser) {
+      console.log('Navbar received user with wallet:', localUser.wallet);
     }
-  }, [user]);
+  }, [localUser]);
+  
+  // Function to refresh wallet balance
+  const handleRefreshWallet = async () => {
+    if (!user || refreshingWallet || !refreshUserData) return;
+    
+    try {
+      setRefreshingWallet(true);
+      const updatedUser = await refreshUserData();
+      if (updatedUser) {
+        setLocalUser(updatedUser);
+        console.log('Wallet balance refreshed:', updatedUser.wallet);
+      }
+    } catch (error) {
+      console.error('Error refreshing wallet balance:', error);
+    } finally {
+      setRefreshingWallet(false);
+    }
+  };
 
   // Close profile menu when clicking outside
   useEffect(() => {
@@ -54,14 +79,37 @@ const Navbar = ({ cartCount = 0, onCheckoutClick, onOrderHistoryClick, user, onL
           {/* Wallet, auth and cart icons */}
           <div className="hidden md:flex items-center space-x-6">
             {/* Wallet - Only show if user is logged in */}
-            {user && (
+            {localUser && (
               <div className="relative group">
-                <button className="flex items-center hover:text-indigo-200 transition">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                  </svg>
-                  <span>NPR {walletBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                </button>
+                <div className="flex items-center">
+                  <button className="flex items-center hover:text-indigo-200 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                    </svg>
+                    <span>NPR {walletBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                  </button>
+                  <button 
+                    onClick={handleRefreshWallet}
+                    className="ml-2 text-white hover:text-indigo-200 transition"
+                    title="Refresh wallet balance"
+                    disabled={refreshingWallet}
+                  >
+                    <svg 
+                      xmlns="http://www.w3.org/2000/svg" 
+                      className={`h-5 w-5 ${refreshingWallet ? 'animate-spin' : ''}`} 
+                      fill="none" 
+                      viewBox="0 0 24 24" 
+                      stroke="currentColor"
+                    >
+                      <path 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round" 
+                        strokeWidth={2} 
+                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" 
+                      />
+                    </svg>
+                  </button>
+                </div>
                 <div className="absolute right-0 w-48 bg-white rounded-md shadow-lg py-2 z-10 text-gray-700 hidden group-hover:block">
                   <div className="px-4 py-2 border-b">
                     <p className="font-semibold">Wallet Balance</p>
@@ -89,23 +137,23 @@ const Navbar = ({ cartCount = 0, onCheckoutClick, onOrderHistoryClick, user, onL
             </button>
 
             {/* Authentication - User Profile or Login/Register */}
-            {user ? (
+            {localUser ? (
               <div className="relative" ref={profileMenuRef}>
                 <button 
                   className="flex items-center hover:text-indigo-200 transition"
                   onClick={() => setShowProfileMenu(!showProfileMenu)}
                 >
                   <div className="h-8 w-8 rounded-full bg-indigo-300 flex items-center justify-center text-indigo-800 font-medium mr-2">
-                    {user.name.charAt(0).toUpperCase()}
+                    {localUser.name.charAt(0).toUpperCase()}
                   </div>
-                  <span className="hidden md:block">{user.name}</span>
+                  <span className="hidden md:block">{localUser.name}</span>
                 </button>
                 
                 {showProfileMenu && (
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
                     <div className="px-4 py-2 text-xs text-gray-500 border-b">
                       <div>Signed in as</div>
-                      <div className="font-semibold text-indigo-700">{user.email}</div>
+                      <div className="font-semibold text-indigo-700">{localUser.email}</div>
                     </div>
                     
                     <Link 
@@ -159,7 +207,7 @@ const Navbar = ({ cartCount = 0, onCheckoutClick, onOrderHistoryClick, user, onL
             )}
 
             {/* Order History - Only show if user is logged in */}
-            {user && (
+            {localUser && (
               <button onClick={onOrderHistoryClick} className="flex items-center hover:text-indigo-200 transition">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
@@ -242,7 +290,7 @@ const Navbar = ({ cartCount = 0, onCheckoutClick, onOrderHistoryClick, user, onL
           </NavLink>
           
           {/* Mobile authentication links */}
-          {!user && (
+          {!localUser && (
             <>
               <div className="border-t border-indigo-500 my-2"></div>
               <NavLink to="/login" 
@@ -266,16 +314,16 @@ const Navbar = ({ cartCount = 0, onCheckoutClick, onOrderHistoryClick, user, onL
         </div>
 
         {/* Mobile user options */}
-        {user && (
+        {localUser && (
           <div className="pt-4 pb-3 border-t border-indigo-500">
             <div className="flex items-center justify-between px-5">
               <div className="flex items-center">
                 <div className="h-8 w-8 rounded-full bg-indigo-300 flex items-center justify-center text-indigo-800 font-medium">
-                  {user.name.charAt(0).toUpperCase()}
+                  {localUser.name.charAt(0).toUpperCase()}
                 </div>
                 <div className="ml-3">
-                  <div className="text-base font-medium">{user.name}</div>
-                  <div className="text-sm text-indigo-200">{user.email}</div>
+                  <div className="text-base font-medium">{localUser.name}</div>
+                  <div className="text-sm text-indigo-200">{localUser.email}</div>
                 </div>
               </div>
             </div>
