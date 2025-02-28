@@ -162,7 +162,6 @@ function App() {
               />
             } />
             <Route path="/orders" element={<OrderHistory user={user} />} />
-            <Route path="/categories" element={<Categories />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/wallet/add" element={<AddFunds user={user} refreshUserData={refreshUserData} />} />

@@ -71,7 +71,6 @@ const Navbar = ({ cartCount = 0, onCheckoutClick, onOrderHistoryClick, user, onL
           <div className="hidden md:flex items-center space-x-8">
             <NavLink to="/" className={({ isActive }) => isActive ? activeClassName : inactiveClassName}>Home</NavLink>
             <NavLink to="/products" className={({ isActive }) => isActive ? activeClassName : inactiveClassName}>Products</NavLink>
-            <NavLink to="/categories" className={({ isActive }) => isActive ? activeClassName : inactiveClassName}>Categories</NavLink>
             <NavLink to="/about" className={({ isActive }) => isActive ? activeClassName : inactiveClassName}>About</NavLink>
             <NavLink to="/contact" className={({ isActive }) => isActive ? activeClassName : inactiveClassName}>Contact</NavLink>
           </div>
