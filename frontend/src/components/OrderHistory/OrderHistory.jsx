@@ -207,11 +207,29 @@ const OrderHistory = () => {
                               <div className="grid grid-cols-1 gap-4">
                                 {orderDetails.products && orderDetails.products.map((item, index) => (
                                   <div key={index} className="flex justify-between items-center py-2 border-b border-gray-200">
-                                    <div>
-                                      <p className="text-sm font-medium text-gray-800">Product ID: {item.product_uuid}</p>
-                                      <p className="text-xs text-gray-500">
-                                        NPR {item.price.toLocaleString()} x {item.quantity}
-                                      </p>
+                                    <div className="flex items-start">
+                                      {item.product_image && (
+                                        <img 
+                                          src={`http://127.0.0.1:8000/storage/${item.product_image}`}
+                                          alt={item.product_name || 'Product image'} 
+                                          className="w-12 h-12 object-cover rounded-md mr-3"
+                                          onError={(e) => {
+                                            e.target.src = 'https://via.placeholder.com/50?text=NexShop';
+                                            e.target.onerror = null;
+                                          }}
+                                        />
+                                      )}
+                                      <div>
+                                        <p className="text-sm font-medium text-gray-800">
+                                          {item.product_name || 'Unknown Product'}
+                                        </p>
+                                        <p className="text-xs text-gray-500">
+                                          Product ID: {item.product_uuid}
+                                        </p>
+                                        <p className="text-xs text-gray-500">
+                                          NPR {item.price.toLocaleString()} x {item.quantity}
+                                        </p>
+                                      </div>
                                     </div>
                                     <div className="text-sm text-gray-700">
                                       Total: NPR {(item.price * item.quantity).toLocaleString()}
