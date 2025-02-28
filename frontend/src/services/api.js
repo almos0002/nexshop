@@ -95,6 +95,7 @@ export const placeOrder = async (orderData) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        ...authHeader()
       },
       body: JSON.stringify(orderData),
     });
@@ -116,7 +117,9 @@ export const placeOrder = async (orderData) => {
  */
 export const fetchOrderHistory = async () => {
   try {
-    const response = await fetch(`${API_BASE_URL}/orders`);
+    const response = await fetch(`${API_BASE_URL}/orders`, {
+      headers: authHeader()
+    });
     
     if (!response.ok) {
       throw new Error(`Error: ${response.status}`);
@@ -129,11 +132,96 @@ export const fetchOrderHistory = async () => {
   }
 };
 
+export const login = async (credentials) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(credentials),
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Login failed');
+    }
+    
+    const data = await response.json();
+    // Store the token in localStorage
+    localStorage.setItem('auth_token', data.access_token);
+    localStorage.setItem('user', JSON.stringify(data.user));
+    
+    return data;
+  } catch (error) {
+    console.error('Error during login:', error);
+    throw error;
+  }
+};
+
+export const register = async (userData) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(userData),
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Registration failed');
+    }
+    
+    const data = await response.json();
+    // Store the token in localStorage
+    localStorage.setItem('auth_token', data.access_token);
+    localStorage.setItem('user', JSON.stringify(data.user));
+    
+    return data;
+  } catch (error) {
+    console.error('Error during registration:', error);
+    throw error;
+  }
+};
+
+export const logout = () => {
+  // Remove auth data from localStorage
+  localStorage.removeItem('auth_token');
+  localStorage.removeItem('user');
+};
+
+export const getAuthToken = () => {
+  return localStorage.getItem('auth_token');
+};
+
+export const getUser = () => {
+  const userString = localStorage.getItem('user');
+  return userString ? JSON.parse(userString) : null;
+};
+
+export const isAuthenticated = () => {
+  return !!getAuthToken();
+};
+
+// Add authentication to API calls that need it
+const authHeader = () => {
+  const token = getAuthToken();
+  return token ? { 'Authorization': `Bearer ${token}` } : {};
+};
+
 // Export default object with all API functions
 export default {
   fetchProducts,
   fetchProductByUUID,
   fetchProductById,
   placeOrder,
-  fetchOrderHistory
+  fetchOrderHistory,
+  login,
+  register,
+  logout,
+  getAuthToken,
+  getUser,
+  isAuthenticated
 };

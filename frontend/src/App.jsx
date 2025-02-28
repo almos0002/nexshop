@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import Navbar from './components/Navbar/Navbar';
 import ProductList from './components/Products/ProductList';
@@ -11,10 +11,28 @@ import Contact from './components/Pages/Contact';
 import Categories from './components/Pages/Categories';
 import AddFunds from './components/Wallet/AddFunds';
 import TransactionHistory from './components/Wallet/TransactionHistory';
+import Login from './components/Auth/Login';
+import Register from './components/Auth/Register';
+import { getUser, logout } from './services/api';
 
 function App() {
   const [cartItems, setCartItems] = useState([]);
+  const [user, setUser] = useState(null);
   const navigate = useNavigate();
+
+  // Check if user is already logged in
+  useEffect(() => {
+    const loggedInUser = getUser();
+    if (loggedInUser) {
+      setUser(loggedInUser);
+    }
+  }, []);
+
+  const handleLogout = () => {
+    logout();
+    setUser(null);
+    navigate('/');
+  };
 
   const addToCart = (product) => {
     setCartItems(prevItems => {
@@ -39,6 +57,8 @@ function App() {
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Navbar 
         cartCount={cartItems.length} 
+        user={user}
+        onLogout={handleLogout}
         onCheckoutClick={() => navigate('/checkout')}
         onOrderHistoryClick={() => navigate('/orders')}
       />
@@ -48,13 +68,15 @@ function App() {
           <Route path="/" element={<ProductList addToCart={addToCart} />} />
           <Route path="/products" element={<ProductList addToCart={addToCart} />} />
           <Route path="/products/:uuid" element={<ProductDetail addToCart={addToCart} />} />
-          <Route path="/checkout" element={<Checkout cartItems={cartItems} setCartItems={setCartItems} />} />
-          <Route path="/orders" element={<OrderHistory />} />
+          <Route path="/checkout" element={<Checkout cartItems={cartItems} setCartItems={setCartItems} user={user} />} />
+          <Route path="/orders" element={<OrderHistory user={user} />} />
           <Route path="/categories" element={<Categories />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
-          <Route path="/wallet/add" element={<AddFunds />} />
-          <Route path="/wallet/history" element={<TransactionHistory />} />
+          <Route path="/wallet/add" element={<AddFunds user={user} />} />
+          <Route path="/wallet/history" element={<TransactionHistory user={user} />} />
+          <Route path="/login" element={<Login onLoginSuccess={setUser} />} />
+          <Route path="/register" element={<Register onRegisterSuccess={setUser} />} />
         </Routes>
       </main>
       
