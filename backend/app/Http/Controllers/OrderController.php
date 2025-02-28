@@ -16,12 +16,17 @@ class OrderController extends Controller
 {
     public function index()
     {
+        // Get the authenticated user
+        $user = auth()->user();
+        
+        // Return only orders for the authenticated user
         return response()->json([
-            "data" => Order::all()->map(function ($order) {
+            "data" => Order::where('user_id', $user->id)->get()->map(function ($order) {
                 return [
                     "uuid" => $order->uuid,
                     "user_id" => $order->user_id,
-                    "total_price" => $order->total_price
+                    "total_price" => $order->total_price,
+                    "created_at" => $order->created_at
                 ];
             })
         ]);
@@ -120,12 +125,21 @@ class OrderController extends Controller
 
     public function show(string $uuid)
     {
-        $order = Order::where('uuid', $uuid)->first();
+        $user = auth()->user();
+        $order = Order::where('uuid', $uuid)->where('user_id', $user->id)->first();
+        
+        if (!$order) {
+            return response()->json([
+                'error' => 'Order not found or you do not have permission to view it'
+            ], 404);
+        }
+        
         $orderProducts = OrderProduct::where('order_uuid', $uuid)->get();
         return response()->json([
             'uuid' => $order->uuid,
             'user_id' => $order->user_id,
             'total_price' => $order->total_price,
+            'created_at' => $order->created_at,
             'products' => OrderProductResource::collection($orderProducts)
         ]);
     }

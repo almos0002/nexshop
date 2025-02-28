@@ -121,22 +121,70 @@ export const placeOrder = async (orderData) => {
 };
 
 /**
- * Fetch order history
+ * Fetch order history for the authenticated user
  * @returns {Promise<Array>} - The order history data
  */
 export const fetchOrderHistory = async () => {
   try {
+    const token = getAuthToken();
+    if (!token) {
+      throw new Error('Authentication required to view order history');
+    }
+    
     const response = await fetch(`${API_BASE_URL}/orders`, {
       headers: authHeader()
     });
     
+    if (response.status === 401) {
+      // Handle unauthorized
+      logout();
+      throw new Error('Your session has expired. Please log in again.');
+    }
+    
     if (!response.ok) {
-      throw new Error(`Error: ${response.status}`);
+      throw new Error(`Error fetching orders: ${response.status}`);
     }
     
     return await response.json();
   } catch (error) {
     console.error('Error fetching order history:', error);
+    throw error;
+  }
+};
+
+/**
+ * Fetch order details by UUID for the authenticated user
+ * @param {string} uuid - The order UUID
+ * @returns {Promise<Object>} - The order details
+ */
+export const fetchOrderDetails = async (uuid) => {
+  try {
+    const token = getAuthToken();
+    if (!token) {
+      throw new Error('Authentication required to view order details');
+    }
+    
+    const response = await fetch(`${API_BASE_URL}/orders/${uuid}`, {
+      headers: authHeader()
+    });
+    
+    if (response.status === 401) {
+      // Handle unauthorized
+      logout();
+      throw new Error('Your session has expired. Please log in again.');
+    }
+    
+    if (response.status === 404) {
+      throw new Error('Order not found or you do not have permission to view it');
+    }
+    
+    if (!response.ok) {
+      throw new Error(`Error fetching order details: ${response.status}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error(`Error fetching order details for ${uuid}:`, error);
     throw error;
   }
 };
@@ -310,6 +358,7 @@ export default {
   fetchProductById,
   placeOrder,
   fetchOrderHistory,
+  fetchOrderDetails,
   login,
   register,
   logout,
