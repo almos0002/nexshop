@@ -1,7 +1,8 @@
-import { useState } from 'react';
-import { placeOrder } from '../../services/api';
+import { useState, useEffect } from 'react';
+import { placeOrder, fetchCurrentUser } from '../../services/api';
+import { useNavigate } from 'react-router-dom';
 
-const Checkout = ({ cartItems, setCartItems }) => {
+const Checkout = ({ cartItems, setCartItems, user, refreshUserData }) => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -17,9 +18,26 @@ const Checkout = ({ cartItems, setCartItems }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [orderError, setOrderError] = useState(null);
-
+  const [walletBalance, setWalletBalance] = useState(user?.wallet || 0);
+  const navigate = useNavigate();
+  
+  // Update form data when user changes
+  useEffect(() => {
+    if (user) {
+      setFormData(prev => ({
+        ...prev,
+        name: user.name || prev.name,
+        email: user.email || prev.email
+      }));
+      setWalletBalance(user.wallet || 0);
+    }
+  }, [user]);
+  
   // Calculate totals
-  const subtotal = cartItems.reduce((sum, item) => sum + item.price, 0);
+  const subtotal = cartItems.reduce((sum, item) => {
+    const quantity = item.quantity || 1;
+    return sum + (item.price * quantity);
+  }, 0);
   const tax = subtotal * 0.13; // 13% VAT in Nepal
   const shipping = subtotal > 0 ? 100 : 0; // Fixed shipping rate in NPR
   const total = subtotal + tax + shipping;
@@ -48,36 +66,45 @@ const Checkout = ({ cartItems, setCartItems }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (!user) {
+      setOrderError('Please log in to place an order');
+      navigate('/login');
+      return;
+    }
+    
+    if (cartItems.length === 0) {
+      setOrderError('Your cart is empty');
+      return;
+    }
+    
     setIsSubmitting(true);
     setOrderError(null);
 
     try {
-      // Prepare order data
+      // Format order data according to backend API requirements
       const orderData = {
-        customer: {
-          name: formData.name,
-          email: formData.email,
-          address: formData.address,
-          city: formData.city,
-          zipCode: formData.zipCode
-        },
-        items: cartItems.map(item => ({
-          id: item.id,
+        user_id: user.id,
+        products: cartItems.map(item => ({
+          uuid: item.uuid,
           quantity: item.quantity || 1
-        })),
-        payment: {
-          method: paymentMethod,
-          total: total
-        }
+        }))
       };
 
       // Call API service
       await placeOrder(orderData);
+      
+      // Refresh user data to get updated wallet balance
+      if (refreshUserData) {
+        await refreshUserData();
+      }
+      
       setOrderPlaced(true);
       setCartItems([]);
     } catch (error) {
       console.error('Failed to place order:', error);
-      setOrderError('Failed to place your order. Please try again later.');
+      // Display the specific error message
+      setOrderError(error.message || 'Failed to place your order. Please try again later.');
     } finally {
       setIsSubmitting(false);
     }
@@ -92,7 +119,10 @@ const Checkout = ({ cartItems, setCartItems }) => {
         <h2 className="text-2xl font-bold text-gray-800 mb-2">Order Placed Successfully!</h2>
         <p className="text-gray-600 mb-6">Thank you for your purchase. Your order has been placed successfully.</p>
         <button
-          onClick={() => setOrderPlaced(false)}
+          onClick={() => {
+            setOrderPlaced(false);
+            navigate('/');
+          }}
           className="bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700 transition"
         >
           Continue Shopping
@@ -314,7 +344,7 @@ const Checkout = ({ cartItems, setCartItems }) => {
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2z" />
                           </svg>
-                          <span>Wallet (NPR 1250.75)</span>
+                          <span>Wallet (NPR {walletBalance.toLocaleString()})</span>
                         </label>
                       </div>
                     </div>

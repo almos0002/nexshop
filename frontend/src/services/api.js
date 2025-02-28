@@ -100,11 +100,20 @@ export const placeOrder = async (orderData) => {
       body: JSON.stringify(orderData),
     });
     
+    const data = await response.json();
+    
     if (!response.ok) {
-      throw new Error(`Error: ${response.status}`);
+      // Handle specific error types
+      if (data.error === 'Not Enough Quantity') {
+        throw new Error(`Not enough quantity available for ${data.product || 'some products'}`);
+      } else if (data.error === 'Not Enough Balance') {
+        throw new Error(`Insufficient balance. Required: NPR ${data.required?.toLocaleString(undefined, { minimumFractionDigits: 2 })}, Available: NPR ${data.available?.toLocaleString(undefined, { minimumFractionDigits: 2 })}`);
+      } else {
+        throw new Error(data.error || `Error: ${response.status}`);
+      }
     }
     
-    return await response.json();
+    return data;
   } catch (error) {
     console.error('Error placing order:', error);
     throw error;
