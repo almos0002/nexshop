@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { fetchProductByUUID } from '../../services/api';
 
-const ProductDetail = ({ addToCart }) => {
+const ProductDetail = ({ addToCart, updateCartItemQuantity, cartItems }) => {
   const { uuid } = useParams();
   const navigate = useNavigate();
   const [product, setProduct] = useState(null);
@@ -38,12 +38,20 @@ const ProductDetail = ({ addToCart }) => {
     getProductDetails();
   }, [uuid]);
 
+  // Check if this product is already in the cart and update the quantity input
+  useEffect(() => {
+    if (product && cartItems) {
+      const existingItem = cartItems.find(item => item.id === product.id);
+      if (existingItem) {
+        setQuantity(existingItem.quantity);
+      }
+    }
+  }, [product, cartItems]);
+
   const handleAddToCart = () => {
     if (product && product.stock > 0) {
       // Add product to cart with specified quantity
-      for (let i = 0; i < quantity; i++) {
-        addToCart(product);
-      }
+      addToCart(product, quantity);
       setAddedToCart(true);
       
       // Reset the "Added to cart" message after 3 seconds
@@ -57,15 +65,18 @@ const ProductDetail = ({ addToCart }) => {
     const value = parseInt(e.target.value);
     if (value > 0 && product && value <= product.stock) {
       setQuantity(value);
+      
+      // If product is already in cart, update its quantity automatically
+      if (cartItems && cartItems.some(item => item.id === product.id)) {
+        updateCartItemQuantity(product.id, value);
+      }
     }
   };
 
   const handleBuyNow = () => {
     if (product && product.stock > 0) {
       // Add product to cart with specified quantity
-      for (let i = 0; i < quantity; i++) {
-        addToCart(product);
-      }
+      addToCart(product, quantity);
       // Navigate to checkout
       navigate('/checkout');
     }

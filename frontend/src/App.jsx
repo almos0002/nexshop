@@ -15,11 +15,26 @@ import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
 import { getUser, logout, isAuthenticated, fetchCurrentUser } from './services/api';
 
+// Helper functions for cart persistence
+const saveCartToLocalStorage = (cart) => {
+  localStorage.setItem('nexshop_cart', JSON.stringify(cart));
+};
+
+const getCartFromLocalStorage = () => {
+  const cart = localStorage.getItem('nexshop_cart');
+  return cart ? JSON.parse(cart) : [];
+};
+
 function App() {
-  const [cartItems, setCartItems] = useState([]);
+  const [cartItems, setCartItems] = useState(() => getCartFromLocalStorage());
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+  // Save cart to localStorage whenever it changes
+  useEffect(() => {
+    saveCartToLocalStorage(cartItems);
+  }, [cartItems]);
 
   // Function to refresh user data, can be passed to child components
   const refreshUserData = useCallback(async () => {
@@ -75,29 +90,49 @@ function App() {
     navigate('/');
   };
 
-  const addToCart = (product) => {
+  const addToCart = (product, quantity = 1) => {
     setCartItems(prevItems => {
       // Check if the product is already in the cart
       const existingItem = prevItems.find(item => item.id === product.id);
       
       if (existingItem) {
-        // If it is, increase the quantity
+        // If it is, set the new quantity (not increment)
         return prevItems.map(item => 
           item.id === product.id 
-            ? { ...item, quantity: (item.quantity || 1) + 1 } 
+            ? { ...item, quantity: quantity } 
             : item
         );
       } else {
-        // If not, add it with quantity 1
-        return [...prevItems, { ...product, quantity: 1 }];
+        // If not, add it with specified quantity
+        return [...prevItems, { ...product, quantity }];
       }
     });
+  };
+
+  const updateCartItemQuantity = (productId, newQuantity) => {
+    if (newQuantity < 1) return;
+    
+    setCartItems(prevItems => 
+      prevItems.map(item => 
+        item.id === productId 
+          ? { ...item, quantity: newQuantity } 
+          : item
+      )
+    );
+  };
+
+  const removeFromCart = (productId) => {
+    setCartItems(prevItems => prevItems.filter(item => item.id !== productId));
+  };
+
+  const clearCart = () => {
+    setCartItems([]);
   };
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Navbar 
-        cartCount={cartItems.length} 
+        cartCount={cartItems.reduce((total, item) => total + (item.quantity || 1), 0)} 
         user={user}
         onLogout={handleLogout}
         onCheckoutClick={() => navigate('/checkout')}
@@ -112,10 +147,20 @@ function App() {
           </div>
         ) : (
           <Routes>
-            <Route path="/" element={<ProductList addToCart={addToCart} />} />
-            <Route path="/products" element={<ProductList addToCart={addToCart} />} />
-            <Route path="/products/:uuid" element={<ProductDetail addToCart={addToCart} />} />
-            <Route path="/checkout" element={<Checkout cartItems={cartItems} setCartItems={setCartItems} user={user} refreshUserData={refreshUserData} />} />
+            <Route path="/" element={<ProductList addToCart={addToCart} cartItems={cartItems} />} />
+            <Route path="/products" element={<ProductList addToCart={addToCart} cartItems={cartItems} />} />
+            <Route path="/products/:uuid" element={<ProductDetail addToCart={addToCart} updateCartItemQuantity={updateCartItemQuantity} cartItems={cartItems} />} />
+            <Route path="/checkout" element={
+              <Checkout 
+                cartItems={cartItems} 
+                setCartItems={setCartItems} 
+                updateCartItemQuantity={updateCartItemQuantity}
+                removeFromCart={removeFromCart}
+                clearCart={clearCart}
+                user={user} 
+                refreshUserData={refreshUserData} 
+              />
+            } />
             <Route path="/orders" element={<OrderHistory user={user} />} />
             <Route path="/categories" element={<Categories />} />
             <Route path="/about" element={<About />} />

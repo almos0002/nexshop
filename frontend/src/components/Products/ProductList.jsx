@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import ProductCard from './ProductCard';
 import { fetchProducts } from '../../services/api';
 
-const ProductList = ({ addToCart }) => {
+const ProductList = ({ addToCart, cartItems }) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -83,9 +83,20 @@ const ProductList = ({ addToCart }) => {
 
       {/* Product grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredProducts.map(product => (
-          <ProductCard key={product.id || product.uuid} product={product} addToCart={addToCart} />
-        ))}
+        {filteredProducts.map(product => {
+          // Check if product is in cart
+          const cartItem = cartItems?.find(item => item.id === product.id);
+          const quantityInCart = cartItem ? cartItem.quantity : 0;
+          
+          return (
+            <ProductCard 
+              key={product.id || product.uuid} 
+              product={product} 
+              addToCart={addToCart} 
+              quantityInCart={quantityInCart}
+            />
+          );
+        })}
       </div>
       
       {filteredProducts.length === 0 && (
