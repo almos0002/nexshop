@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { placeOrder } from '../../services/api';
 
 const Checkout = ({ cartItems, setCartItems }) => {
   const [formData, setFormData] = useState({
@@ -15,11 +16,12 @@ const Checkout = ({ cartItems, setCartItems }) => {
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderPlaced, setOrderPlaced] = useState(false);
+  const [orderError, setOrderError] = useState(null);
 
   // Calculate totals
   const subtotal = cartItems.reduce((sum, item) => sum + item.price, 0);
-  const tax = subtotal * 0.08; // 8% tax
-  const shipping = subtotal > 0 ? 4.99 : 0;
+  const tax = subtotal * 0.13; // 13% VAT in Nepal
+  const shipping = subtotal > 0 ? 100 : 0; // Fixed shipping rate in NPR
   const total = subtotal + tax + shipping;
 
   const handleInputChange = (e) => {
@@ -44,16 +46,41 @@ const Checkout = ({ cartItems, setCartItems }) => {
     setCartItems(prevItems => prevItems.filter(item => item.id !== id));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setOrderError(null);
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      // Prepare order data
+      const orderData = {
+        customer: {
+          name: formData.name,
+          email: formData.email,
+          address: formData.address,
+          city: formData.city,
+          zipCode: formData.zipCode
+        },
+        items: cartItems.map(item => ({
+          id: item.id,
+          quantity: item.quantity || 1
+        })),
+        payment: {
+          method: paymentMethod,
+          total: total
+        }
+      };
+
+      // Call API service
+      await placeOrder(orderData);
       setOrderPlaced(true);
       setCartItems([]);
-    }, 1500);
+    } catch (error) {
+      console.error('Failed to place order:', error);
+      setOrderError('Failed to place your order. Please try again later.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (orderPlaced) {
@@ -77,6 +104,12 @@ const Checkout = ({ cartItems, setCartItems }) => {
   return (
     <div>
       <h1 className="text-3xl font-bold text-gray-800 mb-6">Checkout</h1>
+      
+      {orderError && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-md mb-6" role="alert">
+          <p>{orderError}</p>
+        </div>
+      )}
       
       {cartItems.length === 0 ? (
         <div className="bg-white rounded-lg shadow-md p-6 text-center">
@@ -108,7 +141,8 @@ const Checkout = ({ cartItems, setCartItems }) => {
                     />
                     <div className="ml-4 flex-grow">
                       <h3 className="text-md font-medium text-gray-800">{item.name}</h3>
-                      <p className="text-gray-600 text-sm">${item.price.toFixed(2)}</p>
+                      <p className="text-gray-600 text-sm">NPR {item.price.toLocaleString()}</p>
+                      {item.stock <= 5 && <p className="text-orange-500 text-xs">Only {item.stock} left in stock</p>}
                     </div>
                     <div className="flex items-center">
                       <button 
@@ -121,6 +155,7 @@ const Checkout = ({ cartItems, setCartItems }) => {
                       <button 
                         onClick={() => handleQuantityChange(item.id, (item.quantity || 1) + 1)}
                         className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100"
+                        disabled={item.quantity >= item.stock}
                       >
                         +
                       </button>
@@ -140,19 +175,19 @@ const Checkout = ({ cartItems, setCartItems }) => {
               <div className="mt-6 border-t border-gray-200 pt-4">
                 <div className="flex justify-between mb-2">
                   <span className="text-gray-600">Subtotal</span>
-                  <span className="text-gray-800 font-medium">${subtotal.toFixed(2)}</span>
+                  <span className="text-gray-800 font-medium">NPR {subtotal.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between mb-2">
-                  <span className="text-gray-600">Tax (8%)</span>
-                  <span className="text-gray-800 font-medium">${tax.toFixed(2)}</span>
+                  <span className="text-gray-600">VAT (13%)</span>
+                  <span className="text-gray-800 font-medium">NPR {tax.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between mb-4">
                   <span className="text-gray-600">Shipping</span>
-                  <span className="text-gray-800 font-medium">${shipping.toFixed(2)}</span>
+                  <span className="text-gray-800 font-medium">NPR {shipping.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between font-semibold">
                   <span className="text-gray-800 text-lg">Total</span>
-                  <span className="text-indigo-600 text-lg">${total.toFixed(2)}</span>
+                  <span className="text-indigo-600 text-lg">NPR {total.toLocaleString()}</span>
                 </div>
               </div>
             </div>
@@ -279,7 +314,7 @@ const Checkout = ({ cartItems, setCartItems }) => {
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2z" />
                           </svg>
-                          <span>Wallet ($1250.75)</span>
+                          <span>Wallet (NPR 1250.75)</span>
                         </label>
                       </div>
                     </div>
@@ -345,7 +380,7 @@ const Checkout = ({ cartItems, setCartItems }) => {
                       </svg>
                       Processing...
                     </span>
-                  ) : `Pay $${total.toFixed(2)}`}
+                  ) : `Pay NPR ${total.toLocaleString()}`}
                 </button>
               </form>
             </div>
