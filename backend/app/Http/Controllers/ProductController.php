@@ -37,20 +37,20 @@ class ProductController extends Controller
             'image' => 'nullable|image|max:10240', // Max 10MB
         ]);
 
+        // Handle product image upload
+        $imagePath = 'product-images/default-product.jpg'; // Default image path
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('product-images', 'public');
+        }
+
         $product = Product::create([
             'uuid' => 'PP' . mt_rand(100000, 999999),
             'name' => $request->name,
             'description' => $request->description,
             'price' => $request->price,
             'stock' => $request->stock,
+            'image' => $imagePath,
         ]);
-
-        // Handle product image upload
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('product-images', 'public');
-            $product->image = $imagePath;
-            $product->save();
-        }
 
         return redirect()->route('product.list')->with('success', 'Product created successfully');
     }
