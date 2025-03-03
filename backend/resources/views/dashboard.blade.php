@@ -3,16 +3,14 @@
 @section('content')
 <div class="py-6">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 class="text-2xl font-semibold text-gray-900">Dashboard</h1>
-        
+        <h1 class="text-2xl font-semibold text-gray-900">Welcome {{ Auth::user()->name }}!</h1>
+        <p class="mt-1 text-sm text-gray-500">Check your today's stats</p>
+
         @if (session('status'))
             <div class="mt-4 p-4 mb-4 text-sm text-green-700 bg-green-100 rounded-lg" role="alert">
                 {{ session('status') }}
             </div>
         @endif
-
-        <h2 class="mt-6 text-xl font-medium text-gray-900">Welcome {{ Auth::user()->name }}!</h2>
-        <p class="mt-1 text-sm text-gray-500">Check your today's stats</p>
         
         <!-- Stats Cards -->
         <div class="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
@@ -89,14 +87,6 @@
                         </div>
                     </div>
                 </div>
-                <div class="bg-gray-50 px-4 py-4 sm:px-6">
-                    <div class="text-sm">
-                        <a href="{{ route('orders') }}" class="font-medium text-indigo-600 hover:text-indigo-500">
-                            View all orders
-                            <span aria-hidden="true">&rarr;</span>
-                        </a>
-                    </div>
-                </div>
             </div>
             
             <!-- Total Revenue -->
@@ -115,7 +105,7 @@
                                 </dt>
                                 <dd class="flex items-baseline">
                                     <div class="text-2xl font-semibold text-gray-900">
-                                        NPR {{ number_format($TotalRevenue, 2) }}
+                                        {{ number_format($TotalRevenue, 2) }}
                                     </div>
                                 </dd>
                             </dl>
