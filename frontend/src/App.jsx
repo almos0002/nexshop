@@ -13,6 +13,7 @@ import AddFunds from './components/Wallet/AddFunds';
 import TransactionHistory from './components/Wallet/TransactionHistory';
 import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
+import Profile from './components/Profile/Profile';
 import { getUser, logout, isAuthenticated, fetchCurrentUser } from './services/api';
 
 // Helper functions for cart persistence
@@ -168,6 +169,7 @@ function App() {
             <Route path="/wallet/history" element={<TransactionHistory user={user} />} />
             <Route path="/login" element={<Login onLoginSuccess={handleLoginSuccess} />} />
             <Route path="/register" element={<Register onRegisterSuccess={handleLoginSuccess} />} />
+            <Route path="/profile" element={<Profile user={user} refreshUserData={refreshUserData} />} />
           </Routes>
         )}
       </main>
