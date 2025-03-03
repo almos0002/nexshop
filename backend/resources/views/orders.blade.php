@@ -14,58 +14,6 @@
             </a>
         </div>
         
-        <!-- Search and Filters -->
-        <div class="mt-6 bg-white rounded-lg shadow-md p-4">
-            <form action="{{ route('orders') }}" method="GET" class="flex flex-wrap items-end gap-4">
-                <div class="w-full sm:w-auto flex-grow">
-                    <label for="search" class="block text-sm font-medium text-gray-700">Search by Order ID</label>
-                    <div class="mt-1 relative rounded-md shadow-sm">
-                        <input type="text" name="search" id="search" value="{{ request('search') }}" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-3 pr-12 sm:text-sm border-gray-300 rounded-md" placeholder="Enter order ID...">
-                    </div>
-                </div>
-                
-                <div class="w-full sm:w-auto">
-                    <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
-                    <select id="status" name="status" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
-                        <option value="">All Status</option>
-                        <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Completed</option>
-                        <option value="processing" {{ request('status') == 'processing' ? 'selected' : '' }}>Processing</option>
-                    </select>
-                </div>
-                
-                <div class="w-full sm:w-auto">
-                    <label for="sort" class="block text-sm font-medium text-gray-700">Sort By</label>
-                    <select id="sort" name="sort" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
-                        <option value="created_at" {{ request('sort') == 'created_at' ? 'selected' : '' }}>Date</option>
-                        <option value="total_price" {{ request('sort') == 'total_price' ? 'selected' : '' }}>Amount</option>
-                    </select>
-                </div>
-                
-                <div class="w-full sm:w-auto">
-                    <label for="direction" class="block text-sm font-medium text-gray-700">Direction</label>
-                    <select id="direction" name="direction" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
-                        <option value="desc" {{ request('direction') == 'desc' ? 'selected' : '' }}>Descending</option>
-                        <option value="asc" {{ request('direction') == 'asc' ? 'selected' : '' }}>Ascending</option>
-                    </select>
-                </div>
-                
-                <div class="w-full sm:w-auto flex items-center">
-                    <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
-                        Filter
-                    </button>
-                    
-                    @if(request()->has('search') || request()->has('status') || request('sort') || request('direction'))
-                        <a href="{{ route('orders') }}" class="ml-2 inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            Clear
-                        </a>
-                    @endif
-                </div>
-            </form>
-        </div>
-        
         <!-- Results -->
         <div class="mt-6 bg-white shadow overflow-hidden rounded-md">
             @if(count($orders) > 0)
@@ -141,24 +89,22 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                         </svg>
-                                        View
+                                        View Details
                                     </a>
                                 </td>
                             </tr>
                         @endforeach
                     </tbody>
                 </table>
-                
-                <div class="px-4 py-3 border-t border-gray-200 sm:px-6">
+                <div class="p-4">
                     {{ $orders->links() }}
                 </div>
             @else
-                <div class="px-6 py-12 text-center">
+                <div class="p-10 text-center">
                     <svg class="mx-auto h-12 w-12 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
-                    <h3 class="mt-2 text-sm font-medium text-gray-900">No orders found</h3>
-                    <p class="mt-1 text-sm text-gray-500">No orders match your current filter criteria.</p>
+                    <p class="mt-2 text-gray-500 text-lg">No orders found</p>
                 </div>
             @endif
         </div>

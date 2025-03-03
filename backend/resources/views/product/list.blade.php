@@ -23,11 +23,11 @@
                                 <div class="px-4 py-4 sm:px-6">
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center">
-                                            <div class="flex-shrink-0 h-10 w-10 bg-gray-200 rounded-md flex items-center justify-center">
-                                                @if($product->image_url)
-                                                    <img class="h-10 w-10 rounded-md object-cover" src="{{ $product->image_url }}" alt="{{ $product->name }}">
+                                            <div class="flex-shrink-0 h-12 w-12 bg-gray-200 rounded-md flex items-center justify-center overflow-hidden">
+                                                @if($product->image)
+                                                    <img class="h-12 w-12 rounded-md object-cover" src="{{ $product->image_url }}" alt="{{ $product->name }}">
                                                 @else
-                                                    <svg class="h-6 w-6 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <svg class="h-8 w-8 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                                     </svg>
                                                 @endif
@@ -64,26 +64,24 @@
                             </li>
                         @endforeach
                     </ul>
-                    <div class="px-4 py-3 border-t border-gray-200 sm:px-6">
-                        {{ $products->links() }}
-                    </div>
+                </div>
+                <div class="mt-6">
+                    {{ $products->links() }}
                 </div>
             @else
-                <div class="bg-white shadow rounded-lg">
-                    <div class="px-6 py-12 text-center">
-                        <svg class="mx-auto h-12 w-12 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                        </svg>
-                        <h3 class="mt-2 text-sm font-medium text-gray-900">No products</h3>
-                        <p class="mt-1 text-sm text-gray-500">Get started by creating a new product.</p>
-                        <div class="mt-6">
-                            <a href="{{ route('product.create') }}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                                </svg>
-                                Add Product
-                            </a>
-                        </div>
+                <div class="text-center py-12 bg-white shadow overflow-hidden sm:rounded-lg">
+                    <svg class="mx-auto h-16 w-16 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                    </svg>
+                    <h3 class="mt-2 text-lg font-medium text-gray-900">No products found</h3>
+                    <p class="mt-1 text-sm text-gray-500">Get started by creating a new product.</p>
+                    <div class="mt-6">
+                        <a href="{{ route('product.create') }}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                            </svg>
+                            Add Product
+                        </a>
                     </div>
                 </div>
             @endif

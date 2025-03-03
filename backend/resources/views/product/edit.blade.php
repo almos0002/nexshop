@@ -48,7 +48,8 @@
                                 Product Name
                             </label>
                             <div class="mt-1">
-                                <input type="text" name="name" id="name" value="{{ old('name', $product->name) }}" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md" required>
+                                <input type="text" name="name" id="name" value="{{ old('name', $product->name) }}" 
+                                    class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm" required>
                             </div>
                             @error('name')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -60,7 +61,8 @@
                                 Description
                             </label>
                             <div class="mt-1">
-                                <textarea id="description" name="description" rows="4" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">{{ old('description', $product->description) }}</textarea>
+                                <textarea id="description" name="description" rows="4" 
+                                    class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm">{{ old('description', $product->description) }}</textarea>
                             </div>
                             @error('description')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -75,7 +77,8 @@
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <span class="text-gray-500 sm:text-sm">₹</span>
                                 </div>
-                                <input type="number" name="price" id="price" step="0.01" value="{{ old('price', $product->price) }}" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md" placeholder="0.00" required>
+                                <input type="number" name="price" id="price" step="0.01" value="{{ old('price', $product->price) }}" 
+                                    class="appearance-none block w-full pl-7 pr-12 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm" placeholder="0.00" required>
                             </div>
                             @error('price')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -87,7 +90,8 @@
                                 Stock Quantity
                             </label>
                             <div class="mt-1">
-                                <input type="number" name="stock" id="stock" value="{{ old('stock', $product->stock) }}" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md" required>
+                                <input type="number" name="stock" id="stock" value="{{ old('stock', $product->stock) }}" 
+                                    class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm" required>
                             </div>
                             @error('stock')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -101,7 +105,7 @@
                             
                             @if($product->image)
                                 <div class="mt-2 relative rounded-md overflow-hidden" style="max-width: 200px">
-                                    <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="h-48 w-full object-cover">
+                                    <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="h-48 w-full object-cover" id="image-preview-current">
                                 </div>
                             @endif
                             
@@ -111,9 +115,9 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                     </svg>
                                     <div class="flex text-sm text-gray-600">
-                                        <label for="image" class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
+                                        <label for="file-upload" class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
                                             <span>Upload a new image</span>
-                                            <input id="image" name="image" type="file" class="sr-only" accept="image/*">
+                                            <input id="file-upload" name="image" type="file" class="sr-only" accept="image/*" onchange="previewImage(this)">
                                         </label>
                                         <p class="pl-1">or drag and drop</p>
                                     </div>
@@ -125,6 +129,12 @@
                                     </p>
                                 </div>
                             </div>
+                            <div class="mt-2" id="image-preview-container" style="display: none;">
+                                <p class="text-sm font-medium text-gray-700 mb-1">New image preview:</p>
+                                <div class="relative rounded-md overflow-hidden" style="max-width: 200px">
+                                    <img src="" alt="New image preview" class="h-48 w-full object-cover" id="image-preview-new">
+                                </div>
+                            </div>
                             @error('image')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
@@ -132,26 +142,13 @@
                     </div>
 
                     <div class="pt-5">
-                        <div class="flex justify-between">
-                            <form action="{{ route('product.destroy', $product->uuid) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this product?');">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
-                                    <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                    </svg>
-                                    Delete Product
-                                </button>
-                            </form>
-                            
-                            <div class="flex">
-                                <a href="{{ route('product.list') }}" class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                    Cancel
-                                </a>
-                                <button type="submit" class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                    Update Product
-                                </button>
-                            </div>
+                        <div class="flex justify-end">
+                            <a href="{{ route('product.list') }}" class="py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                Cancel
+                            </a>
+                            <button type="submit" class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                Update Product
+                            </button>
                         </div>
                     </div>
                 </form>
@@ -159,4 +156,24 @@
         </div>
     </div>
 </div>
+
+<script>
+function previewImage(input) {
+    const previewContainer = document.getElementById('image-preview-container');
+    const preview = document.getElementById('image-preview-new');
+    
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            previewContainer.style.display = 'block';
+        }
+        
+        reader.readAsDataURL(input.files[0]);
+    } else {
+        previewContainer.style.display = 'none';
+    }
+}
+</script>
 @endsection
