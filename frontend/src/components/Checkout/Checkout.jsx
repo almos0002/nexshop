@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { placeOrder, fetchCurrentUser } from '../../services/api';
 import { useNavigate } from 'react-router-dom';
+import DocumentTitle from '../utils/DocumentTitle';
 
 const Checkout = ({ cartItems, setCartItems, user, refreshUserData }) => {
   const [formData, setFormData] = useState({
@@ -112,36 +113,30 @@ const Checkout = ({ cartItems, setCartItems, user, refreshUserData }) => {
 
   if (orderPlaced) {
     return (
-      <div className="bg-white rounded-lg shadow-md p-6 text-center">
-        <svg className="w-16 h-16 text-green-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-        </svg>
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">Order Placed Successfully!</h2>
-        <p className="text-gray-600 mb-6">Thank you for your purchase. Your order has been placed successfully.</p>
-        <button
-          onClick={() => {
-            setOrderPlaced(false);
-            navigate('/');
-          }}
-          className="bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700 transition"
-        >
-          Continue Shopping
-        </button>
-      </div>
+      <DocumentTitle title="Order Confirmation">
+        <div className="bg-white rounded-lg shadow-md p-6 text-center">
+          <svg className="w-16 h-16 text-green-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">Order Placed Successfully!</h2>
+          <p className="text-gray-600 mb-6">Thank you for your purchase. Your order has been placed successfully.</p>
+          <button
+            onClick={() => {
+              setOrderPlaced(false);
+              navigate('/');
+            }}
+            className="bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700 transition"
+          >
+            Continue Shopping
+          </button>
+        </div>
+      </DocumentTitle>
     );
   }
 
-  return (
-    <div>
-      <h1 className="text-3xl font-bold text-gray-800 mb-6">Checkout</h1>
-      
-      {orderError && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-md mb-6" role="alert">
-          <p>{orderError}</p>
-        </div>
-      )}
-      
-      {cartItems.length === 0 ? (
+  if (cartItems.length === 0) {
+    return (
+      <DocumentTitle title="Checkout - Empty Cart">
         <div className="bg-white rounded-lg shadow-md p-6 text-center">
           <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
@@ -154,7 +149,21 @@ const Checkout = ({ cartItems, setCartItems, user, refreshUserData }) => {
             Continue Shopping
           </button>
         </div>
-      ) : (
+      </DocumentTitle>
+    );
+  }
+
+  return (
+    <DocumentTitle title="Checkout">
+      <div>
+        <h1 className="text-3xl font-bold text-gray-800 mb-6">Checkout</h1>
+        
+        {orderError && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-md mb-6" role="alert">
+            <p>{orderError}</p>
+          </div>
+        )}
+        
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Cart Items */}
           <div className="lg:w-1/2">
@@ -416,8 +425,8 @@ const Checkout = ({ cartItems, setCartItems, user, refreshUserData }) => {
             </div>
           </div>
         </div>
-      )}
-    </div>
+      </div>
+    </DocumentTitle>
   );
 };
 
