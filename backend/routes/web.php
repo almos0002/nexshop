@@ -23,6 +23,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/product/{uuid}/edit', [ProductController::class, 'edit'])->name('product.edit');
     Route::put('/product/{uuid}/update', [ProductController::class, 'update'])->name('product.update');
     Route::delete('/product/{uuid}/delete', [ProductController::class, 'destroy'])->name('product.destroy');
+    
+    // Order history routes
+    Route::get('/orders', [DashboardController::class, 'orders'])->name('orders');
+    Route::get('/orders/{uuid}', [DashboardController::class, 'orderDetails'])->name('orders.details');
 });
 
 require __DIR__ . '/auth.php';

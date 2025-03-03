@@ -20,7 +20,14 @@ class Order extends Model
 
     public function orderProducts()
     {
-        return $this->hasMany(OrderProduct::class);
+        return $this->hasMany(OrderProduct::class, 'order_uuid', 'uuid');
+    }
+
+    public function products()
+    {
+        return $this->belongsToMany(Product::class, 'order_products', 'order_uuid', 'product_uuid', 'uuid', 'uuid')
+            ->withPivot(['quantity', 'price'])
+            ->withTimestamps();
     }
 
     public function transaction(): HasOne
