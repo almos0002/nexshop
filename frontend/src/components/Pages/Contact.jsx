@@ -65,7 +65,7 @@ const Contact = () => {
                   </svg>
                   <div>
                     <h3 className="font-medium text-gray-800">Address</h3>
-                    <p className="text-gray-600">New Baneshwor, Kathmandu</p>
+                    <p className="text-gray-600">Bhat Bhateni, Pulchwok, Lalitpur</p>
                     <p className="text-gray-600">Nepal</p>
                   </div>
                 </div>
@@ -98,15 +98,15 @@ const Contact = () => {
               <h2 className="text-xl font-semibold mb-4 text-gray-800">Business Hours</h2>
               <ul className="space-y-2 text-gray-600">
                 <li className="flex justify-between">
-                  <span>Monday - Friday:</span>
+                  <span>Sunday - Thursday:</span>
                   <span>9:00 AM - 6:00 PM</span>
                 </li>
                 <li className="flex justify-between">
-                  <span>Saturday:</span>
+                  <span>Friday:</span>
                   <span>10:00 AM - 4:00 PM</span>
                 </li>
                 <li className="flex justify-between">
-                  <span>Sunday:</span>
+                  <span>Saturday:</span>
                   <span>Closed</span>
                 </li>
               </ul>

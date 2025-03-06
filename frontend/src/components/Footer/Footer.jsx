@@ -7,7 +7,7 @@ const Footer = () => {
           <div>
             <h2 className="text-xl font-bold mb-4">NexShop</h2>
             <p className="text-gray-400 mb-4">
-              Your one-stop destination for premium electronics and accessories. We provide quality products at competitive prices with exceptional customer service.
+              Your one-stop destination for premium shoes. We provide high quality shoes at competitive prices with exceptional customer service.
             </p>
             <div className="flex space-x-4">
               <a href="#" className="text-gray-400 hover:text-white transition">
@@ -34,7 +34,6 @@ const Footer = () => {
             <ul className="space-y-2">
               <li><a href="#" className="text-gray-400 hover:text-white transition">Home</a></li>
               <li><a href="#" className="text-gray-400 hover:text-white transition">Products</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition">Categories</a></li>
               <li><a href="#" className="text-gray-400 hover:text-white transition">About Us</a></li>
               <li><a href="#" className="text-gray-400 hover:text-white transition">Contact</a></li>
             </ul>
@@ -49,7 +48,7 @@ const Footer = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                 </svg>
-                <span className="text-gray-400">123 Commerce St, City, Country</span>
+                <span className="text-gray-400">Bhat Bhateni, Pulchowk, Lalitpur</span>
               </li>
               <li className="flex items-start">
                 <svg className="w-5 h-5 text-gray-400 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

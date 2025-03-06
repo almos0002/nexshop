@@ -10,13 +10,13 @@ const About = () => {
         <div className="mb-8">
           <h2 className="text-xl font-semibold mb-3 text-gray-800">Our Story</h2>
           <p className="text-gray-600 mb-4">
-            Founded in 2023, NexShop is a premier e-commerce platform dedicated to providing 
-            high-quality products to customers throughout Nepal. What started as a small online 
-            store has quickly grown into one of the region's most trusted shopping destinations.
-          </p>
+            Founded in 2025, NexShop is a premier shoe e-commerce platform dedicated to providing 
+            high-quality shoes to customers throughout Nepal. What started as a small online 
+            store has quickly grown into one of the region's most trusted shoe shopping destinations.
+          </p>  
           <p className="text-gray-600">
             Our mission is to make online shopping accessible, affordable, and enjoyable for all 
-            Nepali consumers, bringing the best products directly to your doorstep with just a 
+            Nepali consumers, bringing the best shoes directly to your doorstep with just a 
             few clicks.
           </p>
         </div>
