@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
+use App\Notifications\WelcomeEmailNotification;
 
 class AuthController extends Controller
 {
@@ -58,6 +59,9 @@ class AuthController extends Controller
         event(new Registered($user));
 
         $token = $user->createToken('auth_token')->plainTextToken;
+
+        // Send welcome email
+        $user->notify(new WelcomeEmailNotification());
 
         return response()->json([
             'access_token' => $token,
